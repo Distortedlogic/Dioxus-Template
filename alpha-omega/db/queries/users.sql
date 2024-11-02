@@ -65,6 +65,23 @@ VALUES (
 )
 RETURNING *;
 
+--! bulk_insert_users
+INSERT INTO users (
+    email,
+    username,
+    first_name,
+    last_name,
+    permission
+)
+SELECT 
+    (value->>'email')::text,
+    (value->>'username')::text,  
+    (value->>'first_name')::text,
+    (value->>'last_name')::text,
+    (value->>'permission')::permission
+FROM json_array_elements(:users::json)
+RETURNING *;
+
 --! delete_user
 DELETE FROM users
 WHERE id = :id

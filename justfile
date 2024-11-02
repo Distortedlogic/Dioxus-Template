@@ -6,17 +6,17 @@ default:
   @just --choose --justfile {{justfile()}}
 
 setup:
-  nu "just.scripts.nu" "setup"
+  nu -c "source just.nu; setup"
 
 add-targets:
-  nu just.scripts.nu add-targets
+  nu -c "source just.nu; add-targets"
 
 services:
   nu -c "source just.nu; services"
 
 tailwind project="alpha-omega" watch="false":
-  nu "just.scripts.nu" "tailwind" {{project}} {{if watch == "true" { "--watch" } else { "" } }}
+  nu -c "source just.nu; tailwind {{project}} {{if watch == "true" { "--watch" } else { "" } }}"
 
 runner project="alpha-omega" target="desktop":
-  nu "just.scripts.nu" "runner" {{project}} {{target}}
+  nu -c "source just.nu; runner {{project}} {{target}}"
 
