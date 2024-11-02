@@ -6,21 +6,17 @@ default:
   @just --choose --justfile {{justfile()}}
 
 setup:
-  just install
-  just services
-  @echo "Open three new terminals and run the following in each, just tailwind, just runner server, just runner desktop"
-
-install:
-  nu "scripts/install.nu"
-
-services:
-  nu "scripts/services.nu"
-
-tailwind project="alpha-omega" watch="false":
-  nu "scripts/tailwind.nu" {{project}} {{if watch == "true" { "--watch" } else { "" } }}
-
-runner project="alpha-omega" target="desktop":
-  nu "scripts/runner.nu" {{project}} {{target}}
+  nu "just.scripts.nu" "setup"
 
 add-targets:
-  nu "scripts/add-targets.nu"
+  nu just.scripts.nu add-targets
+
+services:
+  nu -c "source just.nu; services"
+
+tailwind project="alpha-omega" watch="false":
+  nu "just.scripts.nu" "tailwind" {{project}} {{if watch == "true" { "--watch" } else { "" } }}
+
+runner project="alpha-omega" target="desktop":
+  nu "just.scripts.nu" "runner" {{project}} {{target}}
+

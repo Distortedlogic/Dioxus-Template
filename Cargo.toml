@@ -33,6 +33,7 @@ chatgpt_rs = "1.2.3"
 
 # Misc
 # Datatypes
+android_logger = "0.14.1"
 anyhow = "1.0.92"
 axum = { version = "0.7.7", features = ["multipart"] }
 base64 = { version = "0.22.1" }
