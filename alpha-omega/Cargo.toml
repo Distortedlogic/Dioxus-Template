@@ -15,17 +15,23 @@ server = { path = "./server" }
 axum = { workspace = true, optional = true }
 deadpool-postgres = { workspace = true, optional = true }
 dioxus = { workspace = true }
+dioxus-web = { workspace = true, optional = true }
 dotenvy = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 tokio = { workspace = true, optional = true }
-tracing = { workspace = true, optional = true }
-tracing-subscriber = { workspace = true, optional = true }
-tracing-wasm = { version = "0.2.1", optional = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true, default-features = false, features = ["registry", "std"] }
 
 [features]
-desktop = ["dioxus/desktop", "shared"]
-mobile = ["dioxus/mobile", "shared"]
-server = ["dep:axum", "dep:deadpool-postgres", "dep:tokio", "dep:tracing", "dep:tracing-subscriber", "dioxus/axum", "shared"]
-shared = ["dioxus/devtools", "dioxus/fullstack", "dioxus/router", "dioxus/ssr"]
-web = ["dep:tracing-wasm", "dioxus/web", "shared"]
+desktop = ["dioxus/desktop", "dioxus/devtools", "dioxus/router"]
+mobile = ["dioxus/devtools", "dioxus/mobile", "dioxus/router"]
+server = ["dep:axum", "dep:deadpool-postgres", "dep:tokio", "dioxus/axum", "dioxus/devtools", "dioxus/fullstack", "dioxus/router", "dioxus/ssr"]
+web = ["dioxus-web/hydrate", "dioxus/devtools", "dioxus/fullstack", "dioxus/web"]
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+console_error_panic_hook = "0.1.7"
+tracing-wasm = "0.2.1"
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+tracing-subscriber = { version = "0.3.18", default-features = false, features = ["fmt"] }

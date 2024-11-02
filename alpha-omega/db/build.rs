@@ -1,13 +1,12 @@
 use cornucopia::CodegenSettings;
-use dotenvy::dotenv;
 use postgres::{Client, NoTls};
 use std::env;
 use std::path::Path;
 
 refinery::embed_migrations!("./migrations");
 
+#[dotenvy::load(path = "../../.env")]
 fn main() {
-	dotenv().ok();
 	let db_url = env::var("DATABASE_URL").unwrap();
 	let queries_path = "queries";
 	let file_path = Path::new("src").join("cornucopia.rs");

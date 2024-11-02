@@ -5,12 +5,14 @@ use components::job_panels::JobInfo;
 use dioxus::prelude::*;
 use polars::prelude::*;
 
-pub fn App() -> Element {
-	let df_signal = use_signal(|| LazyFrame::scan_parquet("assets/data/upwork.parquet", Default::default()).unwrap().collect().unwrap());
+#[component]
+fn Index() -> Element {
+	let df_signal = use_signal(|| LazyFrame::scan_parquet(asset!("../public/data/upwork.parquet").resolve(), Default::default()).unwrap().collect().unwrap());
 	let mut current_idx = use_signal(|| 0);
 	let df = df_signal();
 	let total = df.height();
 	rsx! {
+		document::Link { rel: asset!("../public/tailwind.css") }
 		div { class: "h-screen flex flex-col",
 			div { class: "flex items-center gap-4 p-4 border-b",
 				button {
@@ -44,6 +46,35 @@ pub fn App() -> Element {
 					}
 				}
 				ChatPanel {}
+			}
+		}
+	}
+}
+
+#[component]
+fn Home() -> Element {
+	rsx! {
+		div { "just another page" }
+	}
+}
+
+#[derive(Routable, Clone, PartialEq)]
+enum Route {
+	#[route("/")]
+	Index {},
+	#[route("/home")]
+	Home {},
+}
+
+pub fn App() -> Element {
+	rsx! {
+		Router::<Route> {
+			config: || {
+					RouterConfig::default()
+							.on_update(|state| {
+									(state.current() == Route::Home {})
+											.then_some(NavigationTarget::Internal(Route::Index {}))
+							})
 			}
 		}
 	}

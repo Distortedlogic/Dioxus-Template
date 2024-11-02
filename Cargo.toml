@@ -46,7 +46,8 @@ cornucopia = "0.9.0"
 cornucopia_async = "0.6.0"
 deadpool-postgres = { version = "0.14.0", features = ["serde"] }
 dioxus = { version = "0.6.0-alpha.4" }
-dotenvy = { version = "0.15.7" }
+dioxus-web = { version = "0.6.0-alpha.4" }
+dotenvy = { git = "https://github.com/allan2/dotenvy.git", features = ["macros"] }
 env_logger = "0.11.0"
 fluent-uri = { version = "0.3.1", features = ["serde"] }
 futures = "0.3.31"
