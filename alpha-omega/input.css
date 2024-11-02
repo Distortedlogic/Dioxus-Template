@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body,
+html {
+  @apply bg-gray-900 text-white;
+}
+
+.border {
+  @apply border-gray-700;
+}
+
+textarea,
+input {
+  @apply bg-gray-800 text-white border-gray-700;
+}

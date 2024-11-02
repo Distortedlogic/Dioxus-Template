@@ -1,0 +1,35 @@
+#:schema https://raw.githubusercontent.com/umnovI/dioxus-config-schema/main/dioxus.schema.json
+
+[application]
+asset_dir = "public"
+default_platform = "desktop"
+hot_reload = true
+name = "alpha-omega"
+out_dir = "dist"
+
+[web.wasm_opt]
+# The level wasm-opt should target. z is the smallest. 4 is the fastest.
+level = "z"
+
+[web.app]
+title = "Dioxus Template"
+
+[web.watcher]
+index_on_404 = true
+reload_html = true
+watch_path = ["./alpha-omega", "./public"]
+
+
+# FIXME: Need to `cd assets` before running `dx bundle` due to https://github.com/DioxusLabs/dioxus/issues/1283
+[bundle]
+category = ""
+copyright = ""
+icon = []
+identifier = ""
+long_description = """
+"""
+name = "dioxus-template"
+osx_frameworks = []
+resources = ["public"]
+short_description = ""
+version = "0.0.1"

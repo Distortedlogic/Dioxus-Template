@@ -1,0 +1,18 @@
+[package]
+authors = { workspace = true }
+description = { workspace = true }
+edition = { workspace = true }
+license = { workspace = true }
+name = "components"
+repository = { workspace = true }
+version = "0.1.0"
+
+[dependencies]
+server = { path = "../server" }
+
+dioxus = { workspace = true }
+futures = { workspace = true }
+misanthropic = { workspace = true }
+polars = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
