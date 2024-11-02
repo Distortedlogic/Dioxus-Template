@@ -18,7 +18,7 @@ fn main() {
 		use dx_logger as dioxus_logger;
 		dioxus_logger::init(dioxus_logger::tracing::Level::INFO).expect("failed to init logger");
 	}
-	fullstack!(dioxus::fullstack::prelude::server_fn::client::set_server_url("http://127.0.0.1:8001"));
+	client!(dioxus::fullstack::prelude::server_fn::client::set_server_url("http://127.0.0.1:8001"));
 
 	dioxus::LaunchBuilder::new()
 		.with_cfg(web!(dioxus::web::Config::new().hydrate(true)))
