@@ -9,7 +9,7 @@ setup:
   nu -c "source just.nu; setup"
 
 add-targets:
-  nu -c "source just.nu; add-targets"
+  nu -c "source just.nu; add_targets"
 
 services:
   nu -c "source just.nu; services"
@@ -20,3 +20,8 @@ tailwind project="alpha-omega" watch="false":
 runner project="alpha-omega" target="desktop":
   nu -c "source just.nu; runner {{project}} {{target}}"
 
+gen-db-data:
+  cargo run -p cli -- generate-users
+
+install-postgres:
+  sudo dnf install -y postgresql-devel postgresql-server postgresql-contrib

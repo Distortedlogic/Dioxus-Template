@@ -1,7 +1,7 @@
 use clap::{Parser, Subcommand};
 use db::queries::users;
+use db::queries::users::Users;
 use db::types::public::Permission;
-use db::{create_pool, queries::users::Users};
 use fake::{faker::name, Fake};
 use polars::prelude::ParquetWriter;
 use polars::prelude::*;
@@ -76,7 +76,10 @@ async fn main() {
 				write_to_parquet(&users, &path);
 			}
 			if env::var("WRITE_TO_DB").unwrap_or_else(|_| "false".to_string()) == "true" {
-				let pool = create_pool(&env::var("DATABASE_URL").unwrap());
+				use std::str::FromStr;
+				let config = tokio_postgres::Config::from_str(&env::var("DATABASE_URL").unwrap()).unwrap();
+				let manager = deadpool_postgres::Manager::new(config, tokio_postgres::NoTls);
+				let pool = deadpool_postgres::Pool::builder(manager).build().unwrap();
 				let mut conn = pool.get().await.unwrap();
 				users::bulk_insert_users().bind(conn.as_mut().deref_mut(), &serde_json::to_value(users).unwrap()).all().await.unwrap();
 			}

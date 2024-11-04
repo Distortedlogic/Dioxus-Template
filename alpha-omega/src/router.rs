@@ -1,18 +1,16 @@
 #![allow(non_snake_case)]
-use components::chat_panel::ChatPanel;
-use components::job_panels::JobInfo;
-// use components::overview_panel::OverviewPanel;
+use alpha_omega::components::overview_panel::OverviewPanel;
+use alpha_omega::components::user_info::UserInfo;
+use alpha_omega::db::models::User;
 use dioxus::prelude::*;
-use polars::prelude::*;
 
 #[component]
 fn Index() -> Element {
-	let df_signal = use_signal(|| LazyFrame::scan_parquet(asset!("../public/data/upwork.parquet").resolve(), Default::default()).unwrap().collect().unwrap());
+	let users = use_server_future(get_users)?;
 	let mut current_idx = use_signal(|| 0);
-	let df = df_signal();
-	let total = df.height();
+	let total = 500;
 	rsx! {
-		document::Link { rel: asset!("../public/tailwind.css") }
+		document::Link { rel: asset!("assets/tailwind.css") }
 		div { class: "h-screen flex flex-col",
 			div { class: "flex items-center gap-4 p-4 border-b",
 				button {
@@ -35,17 +33,9 @@ fn Index() -> Element {
 			}
 			div { class: "flex flex-1 overflow-hidden",
 				div { class: "w-1/3 p-4 border-r overflow-y-auto",
-					// OverviewPanel {}
-					JobInfo { df_signal, idx: current_idx }
+					OverviewPanel {}
+					UserInfo { users, idx: current_idx }
 				}
-				div { class: "flex-1 p-4 overflow-y-auto",
-					textarea {
-						class: "w-full h-full p-4 border rounded resize-none",
-						readonly: true,
-						value: df.column("description").unwrap().str().unwrap().get(current_idx()).unwrap()
-					}
-				}
-				ChatPanel {}
 			}
 		}
 	}
@@ -78,4 +68,16 @@ pub fn App() -> Element {
 			}
 		}
 	}
+}
+#[server(GetUsers)]
+pub async fn get_users() -> Result<Vec<User>, ServerFnError> {
+	use alpha_omega::db::conn::DbPool;
+	use alpha_omega::db::schema::users::dsl::*;
+	use diesel::prelude::*;
+
+	let server_context = server_context();
+	let FromContext(pool): FromContext<DbPool> = server_context.extract().await?;
+	let mut conn = pool.get()?;
+
+	users.into_boxed().order(id.asc()).offset(0).limit(25).select(User::as_select()).load(&mut conn).map_err(|e| ServerFnError::ServerError(e.to_string()))
 }

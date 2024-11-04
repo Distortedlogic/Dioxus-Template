@@ -16,7 +16,7 @@ export def services [] {
 
 export def tailwind [project: string, --watch(-w)] {
   let input_path = $'./($project)/input.css'
-  let output_path =  $'./($project)/public/tailwind.css'
+  let output_path =  $'./($project)/assets/tailwind.css'
   let config_path =  $'./($project)/tailwind.config.js'
   
   if $watch {
@@ -28,8 +28,8 @@ export def tailwind [project: string, --watch(-w)] {
 
 export def runner [project: string, kind: string@get_kinds] {
   match $kind {
-    "server" => { cargo run --features server --platform server -p $project }
-    "desktop" => { dx serve --features desktop --platform linux -p $project }
+    "server" => { cargo run --features server -p $project }
+    "desktop" => { cargo run --features desktop -p $project }
     "web" => { dx serve --features web --platform web -p $project }
     "mobile" => { dx serve --features mobile --platform mobile -p $project }
   }
