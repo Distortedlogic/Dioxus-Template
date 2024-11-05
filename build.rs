@@ -5,7 +5,7 @@ use std::env;
 
 pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!("migrations");
 
-#[dotenvy::load(path = "../.env")]
+#[dotenvy::load]
 fn main() {
 	println!("cargo:rerun-if-changed=migrations");
 	let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");

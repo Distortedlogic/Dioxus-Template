@@ -7,8 +7,12 @@ pub fn UserInfo(users: Resource<Result<Vec<User>, ServerFnError>>, idx: Signal<u
 	let current_idx = idx();
 
 	match users() {
-		Some(users) => {
-			let users = users.unwrap();
+		Some(Ok(users)) => {
+			if users.is_empty() {
+				return rsx! {
+					div { "No users loaded" }
+				};
+			}
 			let current_user = &users[current_idx];
 			let first_name = current_user.first_name.clone().unwrap();
 			let last_name = current_user.last_name.clone().unwrap();
@@ -65,10 +69,11 @@ pub fn UserInfo(users: Resource<Result<Vec<User>, ServerFnError>>, idx: Signal<u
 				}
 			}
 		},
-		None => {
-			rsx! {
-				Fragment {}
-			}
+		Some(Err(e)) => rsx! {
+			div { "Error: {e}" }
+		},
+		None => rsx! {
+			div { "Loading or None..." }
 		},
 	}
 }

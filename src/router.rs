@@ -1,14 +1,19 @@
 #![allow(non_snake_case)]
-use alpha_omega::components::overview_panel::OverviewPanel;
-use alpha_omega::components::user_info::UserInfo;
-use alpha_omega::db::models::User;
 use dioxus::prelude::*;
+use dx_starter::components::chat::ChatPanel;
+use dx_starter::components::overview_panel::{user_count, OverviewPanel};
+use dx_starter::components::user_info::UserInfo;
+use dx_starter::db::models::User;
 
 #[component]
 fn Index() -> Element {
 	let users = use_server_future(get_users)?;
+	let count = use_server_future(user_count)?;
 	let mut current_idx = use_signal(|| 0);
-	let total = 500;
+	let total = match count() {
+		Some(Ok(count)) => count as usize,
+		_ => 0,
+	};
 	rsx! {
 		document::Link { rel: asset!("assets/tailwind.css") }
 		div { class: "h-screen flex flex-col",
@@ -17,16 +22,16 @@ fn Index() -> Element {
 					class: "px-3 py-1 rounded disabled:opacity-50",
 					disabled: current_idx() == 0,
 					onclick: move |_| {
-							current_idx.set((current_idx() - 1) % total);
+							current_idx.set((current_idx()) % total);
 					},
 					"◀"
 				}
 				span { "{current_idx + 1}/{total}" }
 				button {
 					class: "px-3 py-1 rounded disabled:opacity-50",
-					disabled: current_idx() >= total - 1,
+					disabled: current_idx() >= total,
 					onclick: move |_| {
-							current_idx.set((current_idx() + 1) % total);
+							current_idx.set((current_idx()) % total);
 					},
 					"▶"
 				}
@@ -36,6 +41,7 @@ fn Index() -> Element {
 					OverviewPanel {}
 					UserInfo { users, idx: current_idx }
 				}
+				ChatPanel {}
 			}
 		}
 	}
@@ -71,13 +77,12 @@ pub fn App() -> Element {
 }
 #[server(GetUsers)]
 pub async fn get_users() -> Result<Vec<User>, ServerFnError> {
-	use alpha_omega::db::conn::DbPool;
-	use alpha_omega::db::schema::users::dsl::*;
 	use diesel::prelude::*;
+	use dx_starter::db::schema::users::dsl::*;
 
-	let server_context = server_context();
-	let FromContext(pool): FromContext<DbPool> = server_context.extract().await?;
-	let mut conn = pool.get()?;
+	use std::env;
+	let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+	let mut pool = PgConnection::establish(&database_url).expect("Error connecting to database");
 
-	users.into_boxed().order(id.asc()).offset(0).limit(25).select(User::as_select()).load(&mut conn).map_err(|e| ServerFnError::ServerError(e.to_string()))
+	users.into_boxed().order(id.asc()).offset(0).limit(25).select(User::as_select()).load(&mut pool).map_err(|e| ServerFnError::ServerError(e.to_string()))
 }

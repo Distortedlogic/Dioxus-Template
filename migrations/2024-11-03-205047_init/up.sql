@@ -1,7 +1,7 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS vector;
 
-CREATE TYPE permission AS ENUM ('Admin', 'Manager', 'Collaborator', 'Viewer');
+CREATE TYPE permission AS ENUM ('admin', 'manager', 'collaborator', 'viewer');
 COMMENT ON TYPE permission IS 'ya know, permissions';
 
 CREATE TABLE users (
@@ -10,7 +10,7 @@ CREATE TABLE users (
   username VARCHAR(50),
   first_name VARCHAR(50),
   last_name VARCHAR(50),
-  permission permission NOT NULL DEFAULT 'Viewer',
+  permission permission NOT NULL DEFAULT 'viewer',
   system_admin BOOLEAN NOT NULL DEFAULT false,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()

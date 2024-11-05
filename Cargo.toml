@@ -1,12 +1,10 @@
-[workspace.package]
+[package]
 authors = []
 description = ""
 edition = "2021"
 license = ""
+name = "dx-starter"
 repository = ""
-
-[workspace]
-members = ["alpha-omega"]
 resolver = "2"
 
 [profile.dev.package."*"]
@@ -26,11 +24,11 @@ opt-level = "z"
 panic = "abort"
 strip = true
 
-[workspace.dependencies]
-dioxus = { version = "0.6.0-alpha.4" }
-dotenvy = { git = "https://github.com/allan2/dotenvy.git", features = ["macros"] }
-hashbrown = { version = "0.15.0" }
+[dependencies]
 # misanthropic = "0.4.2"
+dioxus = { version = "0.6.0-alpha.4", features = ["fullstack", "router"] }
+dotenvy = { git = "https://github.com/allan2/dotenvy.git", features = ["macros"] }
+futures = "0.3.31"
 serde = { version = "1.0.214", features = ["derive"] }
 serde_json = "1.0.132"
 uuid = { version = "1.11.0", features = ["js", "serde", "v4"] }
@@ -39,6 +37,36 @@ wasm-logger = "0.2.0"
 # hyper-rustls = { version = "0.27.3", features = ["http1", "http2", "logging", "native-tokio", "ring", "tls12"] } # Rustls+hyper integration for pure rust HTTPS
 # rustls = { version = "0.23.16", features = ["logging", "ring", "std", "tls12"] }                                 # Rustls is a modern TLS library written in Rust.
 
+[build-dependencies]
+diesel = { version = "2.2.4", features = ["chrono", "postgres", "r2d2", "serde_json", "uuid"] }
+diesel-derive-enum = { version = "2.1.0", features = ["postgres"] }
+diesel_migrations = { version = "2.1.0", features = ["postgres"] }
+dotenvy = { git = "https://github.com/allan2/dotenvy.git", features = ["macros"] }
+
+[features]
+default = []
+server = ["dioxus/server"]
+web = ["dioxus/web"]
+
+[target.'cfg(target_family = "wasm")'.dependencies]
+chrono = { version = "0.4.38", features = ["serde", "wasmbind"] }
+
+[target.'cfg(not(target_family = "wasm"))'.dependencies]
+anyhow = "1.0.92"
+chrono = { version = "0.4.38", features = ["serde"] }
+clap = { version = "4.5.20", features = ["derive"] }
+diesel = { version = "2.2.4", features = ["chrono", "postgres", "r2d2", "serde_json", "uuid"] }
+diesel-derive-enum = { version = "2.1.0", features = ["postgres"] }
+fake = "3.0.0"
+misanthropic = "0.4.2"
+rand = "0.8.5"
+tokio = { version = "1.41.0", features = ["full"] }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+getrandom = { version = "0.2.12", features = ["js"] }
+
+[[bin]]
+name = "gen"
 
 [workspace.lints.rust]
 unsafe_code = "deny"

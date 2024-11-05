@@ -2,11 +2,7 @@ use dioxus::prelude::*;
 
 #[component]
 pub fn OverviewPanel() -> Element {
-	// #[cfg(feature = "web")]
-	// let user_count_resource = use_server_future(user_count)?;
-
-	// #[cfg(not(feature = "web"))]
-	let user_count_resource = use_resource(user_count);
+	let user_count_resource = use_server_future(user_count)?;
 
 	rsx! {
 		match user_count_resource() {
@@ -34,13 +30,10 @@ pub fn OverviewPanel() -> Element {
 
 #[server(UserCount)]
 pub async fn user_count() -> Result<i64, ServerFnError> {
-	use crate::db::conn::DbPool;
 	use crate::db::schema::users::dsl::*;
 	use diesel::prelude::*;
-
-	let server_context = server_context();
-	let FromContext(pool): FromContext<DbPool> = server_context.extract().await?;
-	let mut conn = pool.get()?;
-
-	users.count().get_result(&mut conn).map_err(|e| ServerFnError::ServerError(e.to_string()))
+	use std::env;
+	let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+	let mut pool = PgConnection::establish(&database_url).expect("Error connecting to database");
+	users.count().get_result(&mut pool).map_err(|e| ServerFnError::ServerError(e.to_string()))
 }

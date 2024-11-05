@@ -6,19 +6,14 @@ default:
   @just --choose --justfile {{justfile()}}
 
 setup:
-  nu -c "source just.nu; setup"
-
-add-targets:
-  nu -c "source just.nu; add_targets"
+  cargo install dioxus-cli@0.6.0-alpha.4
 
 services:
-  nu -c "source just.nu; services"
+  podman-compose down
+  podman-compose up --build -d
 
-tailwind project="alpha-omega" watch="false":
-  nu -c "source just.nu; tailwind {{project}} {{if watch == "true" { "--watch" } else { "" } }}"
-
-runner project="alpha-omega" target="desktop":
-  nu -c "source just.nu; runner {{project}} {{target}}"
+tailwind:
+  npx tailwindcss -i ./input.css -o ./assets/tailwind.css -c ./tailwind.config.js --watch
 
 gen-db-data:
   cargo run -p cli -- generate-users
